@@ -1,658 +1,219 @@
-\# Predicting Metabolic Cost During Human Walking
+# Predicting Metabolic Cost During Human Walking
 
-
-
-\## 1. Project Overview
-
-
+## 1. Project Overview
 
 This Machine Learning mini-project investigates the prediction of metabolic cost during human walking using biomechanical and physiological measurements.
 
+Metabolic cost is the energy expenditure associated with walking. Measuring it directly with indirect calorimetry is time-consuming and noisy, so this project asks whether metabolic cost can be predicted from easier-to-obtain walking measurements.
 
+The project is based on the research problem presented in **"Predicting Metabolic Cost During Human-in-the-Loop Optimization"** by Erez Krimsky and Eley Ng (Stanford CS229). A publicly available biomechanics and energetics dataset is used to implement the related prediction task.
 
-Metabolic cost represents the energy expenditure associated with walking. Direct measurement of metabolic cost using laboratory equipment such as indirect calorimetry can be time-consuming and noisy. Therefore, this project investigates whether metabolic cost can be predicted from easier-to-obtain walking-related measurements.
+---
 
+## 2. Dataset
 
+**A biomechanics and energetics dataset of neurotypical adults walking with and without kinematic constraints**
 
-The project is based on the research problem presented in:
+Dataset link: <https://doi.org/10.26188/c.6887854.v1>
 
+The dataset contains walking measurements from neurotypical adults under different walking conditions:
 
+- Electromyography (EMG)
+- Ground reaction forces (GRF)
+- Joint-angle measurements
+- Metabolic measurements from indirect calorimetry
 
-\*\*Predicting Metabolic Cost During Human-in-the-Loop Optimization\*\*
+The project uses the **segmented MATLAB files** provided with the dataset, for subjects 1, 2, 3, 4 and 9.
 
+---
 
+## 3. Problem Statement
 
-by Erez Krimsky and Eley Ng.
+Metabolic-cost prediction is treated as a **supervised regression** problem.
 
+- **Input:** biomechanical and physiological measurements from a walking test
+- **Target:** the measured metabolic cost
 
+The goal is to learn the relationship between the walking features and metabolic cost, and to evaluate how accurately different models predict it.
 
-For this mini-project, a publicly available biomechanics and energetics dataset is used to implement the related metabolic-cost prediction task.
+---
 
+## 4. Features
 
+Each walking test is described by **24 input features**:
 
-\---
+| Group | Features | Count |
+|-------|----------|-------|
+| EMG | Mean EMG of 16 muscles | 16 |
+| Ground reaction force | Peak vertical GRF (left, right) | 2 |
+| Joint range of motion | Hip, knee, ankle ROM (left, right) | 6 |
+| **Total** | | **24** |
 
+---
 
+## 5. Target
 
-\## 2. Dataset
+The target is **metabolic cost in W/kg**, computed as the mean metabolic cost over the final 20% of each walking test.
 
+Each walking test is one row in the generated feature dataset (30 tests per subject).
 
+---
 
-\### Dataset Name
-
-
-
-\*\*A biomechanics and energetics dataset of neurotypical adults walking with and without kinematic constraints\*\*
-
-
-
-The dataset contains walking measurements collected from neurotypical adults under different walking conditions.
-
-
-
-The available measurements include:
-
-
-
-\* Electromyography (EMG)
-
-\* Ground reaction forces (GRF)
-
-\* Joint-angle measurements
-
-\* Metabolic measurements obtained using indirect calorimetry
-
-
-
-\### Dataset Link
-
-
-
-https://doi.org/10.26188/c.6887854.v1
-
-
-
-The project uses the segmented MATLAB files provided with the dataset.
-
-
-
-\---
-
-
-
-\## 3. Problem Statement
-
-
-
-The project treats metabolic-cost prediction as a supervised regression problem.
-
-
-
-The input consists of biomechanical and physiological measurements obtained during walking, while the target is the measured metabolic cost.
-
-
-
-The objective is to learn a relationship between the walking-related features and metabolic cost and evaluate how accurately the models can predict the target.
-
-
-
-\---
-
-
-
-\## 4. Features
-
-
-
-The current feature set contains \*\*24 input features\*\*.
-
-
-
-\### EMG Features
-
-
-
-\* 16 mean EMG features
-
-
-
-\### Ground Reaction Force Features
-
-
-
-\* Peak vertical GRF — Left
-
-\* Peak vertical GRF — Right
-
-
-
-\### Joint Range-of-Motion Features
-
-
-
-\* Hip ROM — Left
-
-\* Hip ROM — Right
-
-\* Knee ROM — Left
-
-\* Knee ROM — Right
-
-\* Ankle ROM — Left
-
-\* Ankle ROM — Right
-
-
-
-Therefore:
-
-
+## 6. Repository Structure
 
 ```text
-
-16 EMG
-
-\+ 2 GRF
-
-\+ 6 Joint ROM
-
-\----------------
-
-24 Features
-
-```
-
-
-
-\---
-
-
-
-\## 5. Target
-
-
-
-The target variable is metabolic cost.
-
-
-
-The target is calculated as the mean metabolic cost during the final 20% of each walking test.
-
-
-
-The metabolic cost is represented in:
-
-
-
-```text
-
-W/kg
-
-```
-
-
-
-Each walking test is represented as one row in the generated feature dataset.
-
-
-
-\---
-
-
-
-\## 6. Feature Extraction
-
-
-
-Feature extraction is implemented using:
-
-
-
-```text
-
-build\_features.py
-
-```
-
-
-
-The script processes the segmented subject data and extracts the features required for the machine-learning models.
-
-
-
-For each walking test, the final 20% of the test is used for calculating the features and metabolic-cost target.
-
-
-
-The generated feature files are stored in:
-
-
-
-```text
-
-features/
-
-```
-
-
-
-The combined dataset is:
-
-
-
-```text
-
-features/all\_subjects.csv
-
-```
-
-
-
-\---
-
-
-
-\## 7. Dataset Organization
-
-
-
-The segmented data for each subject is expected to follow this structure:
-
-
-
-```text
-
-Sub\_N/
-
-├── SubN\_segEnergetics.mat
-
-└── SubN\_segMechanics.mat
-
-```
-
-
-
-For example:
-
-
-
-```text
-
-Sub\_1/
-
-├── Sub1\_segEnergetics.mat
-
-└── Sub1\_segMechanics.mat
-
-```
-
-
-
-The large raw dataset files are not intended to be committed to the GitHub repository.
-
-
-
-\---
-
-
-
-\## 8. Repository Structure
-
-
-
-The main project structure is:
-
-
-
-```text
-
 ml-metabolic-cost/
-
-│
-
 ├── .gitignore
-
 ├── README.md
-
 ├── requirements.txt
-
 │
-
-├── build\_features.py
-
-├── lasso\_baseline.py
-
-├── neural\_net.py
-
-├── ablation.py
-
-├── demo.py
-
+├── build_features.py      # extract features and target from the .mat files
+├── plot_target.py         # data-exploration plots of the target
+├── lasso_baseline.py      # LASSO regression baseline
+├── neural_net.py          # one-hidden-layer neural network
+├── ablation.py            # feature-group ablation
+├── demo.py                # live demo: predict one held-out subject
 │
-
 ├── features/
-
-│   ├── all\_subjects.csv
-
-│   ├── sub1\_features.csv
-
-│   ├── sub2\_features.csv
-
-│   ├── sub3\_features.csv
-
-│   ├── sub4\_features.csv
-
-│   └── sub9\_features.csv
-
+│   ├── all_subjects.csv
+│   ├── sub1_features.csv
+│   ├── sub2_features.csv
+│   ├── sub3_features.csv
+│   ├── sub4_features.csv
+│   └── sub9_features.csv
 │
-
-└── results/
-
+└── results/               # saved plots
 ```
 
+| File | Purpose |
+|------|---------|
+| `build_features.py` | Extracts the features and target from the segmented dataset |
+| `plot_target.py` | Plots the target per subject and for tests T1-T15 vs T16-T30 |
+| `lasso_baseline.py` | LASSO regression baseline |
+| `neural_net.py` | One-hidden-layer neural-network regression model |
+| `ablation.py` | Compares feature groups (EMG only, GRF + joint angles, all features) |
+| `demo.py` | Trains on four subjects and predicts the held-out subject |
 
+---
 
-\### Main Python Files
+## 7. Setup
 
-
-
-\*\*`build\_features.py`\*\*
-
-
-
-Extracts the required features and target from the segmented dataset.
-
-
-
-\*\*`lasso\_baseline.py`\*\*
-
-
-
-Implements the LASSO regression baseline.
-
-
-
-\*\*`neural\_net.py`\*\*
-
-
-
-Implements the neural-network regression model.
-
-
-
-\*\*`ablation.py`\*\*
-
-
-
-Used to investigate the effect of different feature groups.
-
-
-
-\*\*`demo.py`\*\*
-
-
-
-Provides a demonstration of the project/model pipeline.
-
-
-
-\---
-
-
-
-\## 9. Setup
-
-
-
-\### Step 1: Clone the Repository
-
-
+### 1. Clone the repository
 
 ```bash
-
-git clone <REPOSITORY\_URL>
-
-cd <REPOSITORY\_NAME>
-
+git clone https://github.com/hmAdil/ml-metabolic-cost.git
+cd ml-metabolic-cost
 ```
 
+### 2. Create and activate a virtual environment
 
-
-\### Step 2: Create a Virtual Environment
-
-
-
-On Windows:
-
-
+Windows:
 
 ```bash
-
 python -m venv venv
-
+venv\Scripts\activate
 ```
 
-
-
-Activate the environment:
-
-
+macOS / Linux:
 
 ```bash
-
-venv\\Scripts\\activate
-
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-
-
-\### Step 3: Install Dependencies
-
-
+### 3. Install dependencies
 
 ```bash
-
 pip install -r requirements.txt
-
 ```
 
+---
 
+## 8. Getting the Dataset
 
-\---
+Download the segmented files from the dataset page: <https://doi.org/10.26188/c.6887854.v1>
 
-
-
-\## 10. Getting the Dataset
-
-
-
-Download the required segmented dataset files from the dataset page:
-
-
-
-https://doi.org/10.26188/c.6887854.v1
-
-
-
-The required subject files are:
-
-
+For each subject N, the required files are:
 
 ```text
-
-SubN\_segEnergetics.mat
-
-SubN\_segMechanics.mat
-
+SubN_segEnergetics.mat
+SubN_segMechanics.mat
 ```
 
-
-
-Place the files inside the corresponding subject directories.
-
-
-
-For example:
-
-
+Place them in a folder named `Sub_N`:
 
 ```text
-
-Sub\_1/
-
-├── Sub1\_segEnergetics.mat
-
-└── Sub1\_segMechanics.mat
-
+Sub_1/
+├── Sub1_segEnergetics.mat
+└── Sub1_segMechanics.mat
 ```
 
+> **Note:** The raw dataset files are large (up to a few GB per subject) and must **not** be committed to GitHub. They are excluded through `.gitignore`.
 
+---
 
-Large raw dataset files should not be committed to GitHub.
+## 9. Usage
 
+Run all commands from the repository root.
 
-
-\---
-
-
-
-\## 11. Generating Features
-
-
-
-After placing the required dataset files in the correct directories, run:
-
-
+### Generate features
 
 ```bash
-
-python build\_features.py
-
+python build_features.py
 ```
 
+This writes one CSV per subject to `features/` and the combined dataset `features/all_subjects.csv`.
 
+### Explore the target
 
-The script generates subject-level feature CSV files in:
-
-
-
-```text
-
-features/
-
+```bash
+python plot_target.py
 ```
 
+Saves boxplots of metabolic cost to `results/`.
 
+### Train and evaluate the models
 
-and a combined dataset:
-
-
-
-```text
-
-features/all\_subjects.csv
-
+```bash
+python lasso_baseline.py
+python neural_net.py
+python ablation.py
 ```
 
+### Run the demo
 
+```bash
+python demo.py --subject 2
+```
 
-\---
+Trains LASSO on the other four subjects, prints actual vs predicted metabolic cost for each test of the chosen subject, and saves a plot to `results/demo_sub2.png`.
 
+---
 
+## 10. Machine Learning Approach
 
-\## 12. Machine Learning Approach
+Two regression models are compared:
 
+1. LASSO regression (baseline)
+2. One-hidden-layer neural network
 
+Both are evaluated with cross-validation using **Mean Squared Error (MSE)**, which is the average squared difference between actual and predicted metabolic cost (smaller is better). Cross-validation reduces dependence on a single train-test split.
 
-The project uses regression models to predict metabolic cost.
+Models are evaluated in two ways: per subject, and pooled with leave-one-subject-out (train on four subjects, test on the fifth). An ablation analysis investigates the contribution of the different feature groups.
 
+---
 
+## 11. Relationship to the Original Paper
 
-The main models are:
+The original paper studied metabolic-cost prediction using data collected during human-in-the-loop optimization with an assistive robotic device.
 
+This project uses a public dataset instead, so the data and experimental setup are **not identical** to the paper's. The focus here is the machine-learning problem of predicting metabolic cost from walking measurements.
 
+---
 
-1\. LASSO regression baseline
+## 12. Important Notes
 
-2\. One-hidden-layer neural network
-
-
-
-The models are evaluated using cross-validation and Mean Squared Error (MSE).
-
-
-
-The project also investigates the contribution of different feature groups through ablation analysis.
-
-
-
-\---
-
-
-
-\## 13. Evaluation Metric
-
-
-
-The primary evaluation metric is:
-
-
-
-\*\*Mean Squared Error (MSE)\*\*
-
-
-
-MSE measures the average squared difference between the actual and predicted metabolic-cost values.
-
-
-
-A smaller MSE indicates smaller prediction errors.
-
-
-
-Cross-validation is used to evaluate model performance while reducing dependence on a single train-test split.
-
-
-
-\---
-
-
-
-\## 14. Relationship to the Original Research Paper
-
-
-
-The original research paper studied metabolic-cost prediction using data collected during human-in-the-loop optimization with an assistive robotic device.
-
-
-
-This mini-project uses a publicly available biomechanics and energetics dataset to implement the related prediction problem.
-
-
-
-Therefore, the dataset and experimental setup used in this project are not identical to those used in the original paper.
-
-
-
-The project focuses on the machine-learning problem of predicting metabolic cost from walking-related measurements.
-
-
-
-\---
-
-
-
-\## 15. Important Notes
-
-
-
-\* The feature definitions and target calculation should remain consistent throughout the project.
-
-\* Raw and large dataset files should not be committed to GitHub.
-
-\* The generated CSV files contain the processed features used for machine-learning experiments.
-
-\* The project uses supervised regression because the target is a continuous metabolic-cost value.
-
-
-
+- Feature definitions and the target calculation must stay consistent across all scripts.
+- Raw and large dataset files must not be committed to GitHub.
+- The CSV files in `features/` are the processed features used for all experiments.
+- Regression is used because the target is a continuous value.
