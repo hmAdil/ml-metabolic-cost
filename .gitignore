@@ -1,14 +1,5 @@
-# virtual environment
 venv/
-
-# raw dataset (several GB, too big for git)
 Sub_*/
 *.mat
-*.zip
-
-# python / editor / OS junk
 __pycache__/
-*.pyc
 .vscode/
-.DS_Store
-__MACOSX/
