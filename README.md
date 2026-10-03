@@ -72,6 +72,8 @@ ml-metabolic-cost/
 ├── lasso_baseline.py      # LASSO regression baseline
 ├── neural_net.py          # one-hidden-layer neural network
 ├── ablation.py            # feature-group ablation
+├── check_sub9.py          # Subject 9 checks: offset/calibration and EMG channels
+├── snr_compare.py         # EMG signal-to-noise comparison across subjects
 ├── demo.py                # live demo: predict one held-out subject
 │
 ├── features/
@@ -92,6 +94,8 @@ ml-metabolic-cost/
 | `lasso_baseline.py` | LASSO regression baseline |
 | `neural_net.py` | One-hidden-layer neural-network regression model |
 | `ablation.py` | Compares feature groups (EMG only, GRF + joint angles, all features) |
+| `check_sub9.py` | Checks whether Subject 9's error is a constant offset (with calibration from the first few tests) and whether single EMG channels explain his weak EMG-only result |
+| `snr_compare.py` | Reads the EMG signal-to-noise (SNR) values stored in each subject's Energetics file and compares subjects |
 | `demo.py` | Trains on four subjects and predicts the held-out subject |
 
 ---
@@ -150,6 +154,8 @@ Sub_1/
 
 > **Note:** The raw dataset files are large (up to a few GB per subject) and must **not** be committed to GitHub. They are excluded through `.gitignore`.
 
+The processed CSVs in `features/` are included in the repository, so `lasso_baseline.py`, `neural_net.py`, `ablation.py`, `check_sub9.py` and `demo.py` run without the `.mat` files. Only `build_features.py` and `snr_compare.py` need them.
+
 ---
 
 ## 9. Usage
@@ -180,6 +186,15 @@ python neural_net.py
 python ablation.py
 ```
 
+### Check Subject 9
+
+```bash
+python check_sub9.py
+python snr_compare.py
+```
+
+`check_sub9.py` prints, for each held-out subject, the mean residual (actual minus predicted), the share of tests under-predicted, and how calibrating from the first few tests changes the error. It also tests dropping one EMG muscle at a time for Subject 9. `snr_compare.py` prints the median EMG signal-to-noise value per muscle and per subject.
+
 ### Run the demo
 
 ```bash
@@ -199,7 +214,7 @@ Two regression models are compared:
 
 Both are evaluated with cross-validation using **Mean Squared Error (MSE)**, which is the average squared difference between actual and predicted metabolic cost (smaller is better). Cross-validation reduces dependence on a single train-test split.
 
-Models are evaluated in two ways: per subject, and pooled with leave-one-subject-out (train on four subjects, test on the fifth). An ablation analysis investigates the contribution of the different feature groups.
+Models are evaluated in two ways: per subject, and pooled with leave-one-subject-out (train on four subjects, test on the fifth). An ablation analysis investigates the contribution of the different feature groups. Subject 9 has the largest leave-one-subject-out error, so `check_sub9.py` and `snr_compare.py` test two possible explanations (a constant offset, and poor EMG signal quality).
 
 ---
 
