@@ -3,3 +3,4 @@ pandas
 scipy
 h5py
 scikit-learn
+matplotlib
