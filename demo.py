@@ -29,7 +29,7 @@ pred = model.predict(test[feats].values)
 actual = test["target"].values
 
 # Results table
-print(f"\nHeld-out Sub{args.subject} (model trained on subjects {sorted(train['subject'].unique())})")
+print(f"\nHeld-out Sub{args.subject} (model trained on subjects {sorted(int(s) for s in train['subject'].unique())})")
 print(f"{'test':6s}{'actual':>9s}{'predicted':>11s}{'error':>9s}")
 for t, a, p in zip(test["test"], actual, pred):
     print(f"{t:6s}{a:9.3f}{p:11.3f}{p - a:9.3f}")
